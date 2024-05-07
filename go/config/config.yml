@@ -1,0 +1,12 @@
+server:
+  host: 127.0.0.1
+  port: 7000
+database:
+  mysql:
+    host: 192.168.1.5
+    port: 3306
+    dbname: checkindb
+    username: root
+    password: sjl020804
+jwt: 
+  key: 123kjasydo98120ejqlwidas0
