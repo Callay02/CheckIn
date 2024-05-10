@@ -3,10 +3,13 @@ package service
 import (
 	"checkin/middleware"
 	"checkin/model"
+	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 type UserService struct{}
@@ -39,12 +42,31 @@ func (UserService) Login(ctx *gin.Context) {
 }
 
 func (UserService) GetUserInfo(ctx *gin.Context) {
-	id, ok := ctx.Get("uid")
-	if !ok {
-		ctx.JSON(200, new(model.Result).Error("用户信息获取失败"))
-		return
-	}
+	id, _ := ctx.Get("uid")
 	user := model.User{Id: id.(string)}
 	model.DB.First(&user)
 	ctx.JSON(200, new(model.Result).OKSetData(user))
+}
+
+func (UserService) UpdateUserInfo(ctx *gin.Context) {
+	id, _ := ctx.Get("uid")
+	user := model.User{}
+	if err := ctx.ShouldBind(&user); err != nil {
+		ctx.JSON(200, new(model.Result).Error("用户信息获取错误"))
+		return
+	}
+	fmt.Println(user)
+	user.Id = id.(string)
+	user.UpdateTime = strconv.FormatInt(time.Now().Unix(), 10)
+	err := model.DB.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Save(user).Error; err != nil {
+			return err
+		}
+		return nil
+	})
+	if err != nil {
+		ctx.JSON(200, new(model.Result).Error("用户信息更新失败"))
+		return
+	}
+	ctx.JSON(200, new(model.Result).OK("用户信息更新成功"))
 }

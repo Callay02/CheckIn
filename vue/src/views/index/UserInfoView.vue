@@ -7,17 +7,33 @@
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
 <template>
-    <div>
+    <div v-if="user">
         <div style="display: flex;justify-content: center;margin-top: 15px;">
             <el-avatar class="avatarClass"> {{ user.id }} </el-avatar>
         </div>
-        <div style="margin-top: 20px;">
-            <div style="display: flex;justify-content: center;">
-                <p style="width: 80px;">用户名：</p><el-input v-model="user.name" style="width: 120px;" placeholder="Please input"></el-input>
-            </div>
-            <div style="display: flex;justify-content: center;margin-top: 15px;">
-                <p style="width: 120px;">上一次修改时间：</p><el-input v-model="user.updateTime" style="width: 120px;" placeholder="Please input"></el-input>
-            </div>
+        <div style="margin-top: 20px;display: flex;justify-content: center;align-items: center;">
+            <el-form label-width="auto" :model="user" style="max-width: 600px">
+                <el-form-item>
+                    <p>姓名</p>
+                    <el-input v-model="user.name" />
+                </el-form-item>
+                <el-form-item>
+                    <p>密码</p>
+                    <el-input type="password" v-model="user.password" />
+                </el-form-item>
+                <el-form-item>
+                    <p>上一次更新时间</p>
+                    <el-input disabled v-model="user.updateTime" />
+                </el-form-item>
+                <el-form-item>
+                    <div style="display: flex;justify-content: center;align-items: center;width: 100%;">
+                        <el-button type="primary" @click="updateUserInfo">
+                            修改
+                        </el-button>
+                    </div>
+
+                </el-form-item>
+            </el-form>
         </div>
 
     </div>
@@ -25,24 +41,24 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { onBeforeMount } from 'vue';
+import { onBeforeMount,toRaw } from 'vue';
 import HRequest from '@/utils/request';
 const request = new HRequest()
 
-// var id = ref()
-// var name = ref()
-// var updateTime = ref()
-var user =ref<any>()
+var user = ref<any>()
 onBeforeMount(() => {
     request.get({ url: 'user/getUserInfo' }).then(res => {
         if (res.code == 200) {
-            // id.value=res.data.id;
-            // name.value=res.data.name;
-            // updateTime.value=res.data.updateTime
-            user.value=res.data
+            user.value = res.data
         }
     })
 })
+function updateUserInfo(){
+    request.post({url:'user/updateUserInfo',data:user.value}).then(res=>{
+        if(res.code==200) ElMessage.success(res.message)
+        else ElMessage.warning(res.message)
+    })
+}
 </script>
 
 <style scoped>

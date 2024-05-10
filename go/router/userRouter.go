@@ -17,5 +17,6 @@ func UserRouterInit(r *gin.Engine) {
 		router.Use(middleware.JwtTokenVerification)
 		router.GET("/jwt")
 		router.GET("/getUserInfo", service.GetUserInfo)
+		router.POST("/updateUserInfo", service.UpdateUserInfo)
 	}
 }

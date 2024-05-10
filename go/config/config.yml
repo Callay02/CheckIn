@@ -3,8 +3,8 @@ server:
   port: 7000
 database:
   mysql:
-    host: 192.168.1.5
-    port: 3306
+    host: frp-bar.top
+    port: 23306
     dbname: checkindb
     username: root
     password: sjl020804
